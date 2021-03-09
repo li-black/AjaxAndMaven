@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="js/vue.js"></script>
+    <script src="js/axios-0.18.0.js"></script>
+</head>
+<body>
+<div id="div">
+    {{name}}--{{age}}
+    <button @click="send1()">发起GET请求</button>
+    <button @click="send2()">发起POST请求</button>
+</div>
+</body>
+<script>
+    new Vue({
+        el: "#div",
+        data: {
+            name: "张三",
+            age: 22
+        },
+        methods: {
+            send1() {
+                axios({
+                    method: "get",
+                    url: "testServlet",
+                    params: {name: this.name, age: this.age}
+                }).then(resp => {
+                    alert(resp.data);
+                }).catch(error => {
+                    alert(error);
+                });
+            },
+            send2() {
+                axios({
+                    method: "post",
+                    url: "testServlet",
+                    params: {name: this.name, age: this.age}
+                }).then(resp => {
+                    alert(resp.data);
+                }).catch(error => {
+                    alert(error);
+                });
+            },
+        },
+    });
+</script>
+</html>
