@@ -88,7 +88,8 @@
         -->
         <el-form :model="editFormData" :rules="rules" ref="editForm" label-width="100px" class="demo-ruleForm">
             <el-form-item label="学生学号" prop="number">
-                <el-input v-model="editFormData.number"></el-input>
+                <!--                禁止修改学号-->
+                <el-input v-model="editFormData.number" :disabled="true"></el-input>
             </el-form-item>
             <el-form-item label="学生姓名" prop="name">
                 <el-input v-model="editFormData.name"></el-input>
@@ -150,7 +151,7 @@
                         method: "selectByPage",
                         currentPage: this.pagination.currentPage,
                         pageSize: this.pagination.pageSize
-                    }
+                    },
                 }).then(resp => {
                     //将查询出的数据赋值
                     this.tableData = resp.data.list;
@@ -192,17 +193,17 @@
                     method: "post",
                     url: "StudentServlet",
                     params: param
-                }).then(
+                }).then(resp => {
                     //弹出提示框
                     this.$message({
                         message: '添加成功',
                         type: 'success'
                     }),
-                    //关闭添加窗口
-                    this.dialogTableVisible4add = false,
-                    // 重新执行查询
-                    this.selectByPage()
-                );
+                        //关闭添加窗口
+                        this.dialogTableVisible4add = false,
+                        // 重新执行查询
+                        this.selectByPage()
+                });
             },
             resetForm(addForm) {
                 //双向绑定，输入的数据都赋值给了formData， 清空formData数据
@@ -220,7 +221,7 @@
                     name: row.name,
                     birthday: row.birthday,
                     address: row.address,
-                }
+                };
             },
             //修改学生方法
             updateStu() {
@@ -235,21 +236,26 @@
                     method: "post",
                     url: "StudentServlet",
                     params: param
-                }).then(
+                }).then(resp => {
                     //弹出提示框
                     this.$message({
                         message: '修改成功',
                         type: 'success'
                     }),
-                    //关闭添加窗口
-                    this.dialogTableVisible4edit = false,
-                    // 重新执行查询
-                    this.selectByPage()
-                );
+                        //关闭修改窗口
+                        this.dialogTableVisible4edit = false,
+                        // 重新执行查询
+                        this.selectByPage()
+                });
             },
             //删除学生方法
             deleteStu(row) {
-                if (confirm("确定要删除" + row.number + "数据?")) {
+                //弹出提示框
+                this.$confirm('此操作将永久删除该学生信息, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
                     let param = {
                         method: "deleteStu",
                         number: row.number
@@ -258,22 +264,27 @@
                         method: "post",
                         url: "StudentServlet",
                         params: param
-                    }).then(
+                    }).then(resp => {
                         //弹出提示框
                         this.$message({
                             message: '删除成功',
                             type: 'success'
-                        }),
+                        });
                         // 重新执行查询
                         this.selectByPage()
-                    );
-                }
-            }
+                    });
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消删除'
+                    });
+                });
+            },
         },
         mounted() {
             //调用分页查询功能
             this.selectByPage();
-        }
+        },
         // 在创建的时候就执行查询
         // created() {
         //     this.selectByPage();
